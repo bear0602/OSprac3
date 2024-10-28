@@ -19,6 +19,7 @@ void *handle_connection(void *arg) {
     return NULL;
 }
 
+// 
 int main(int argc, char *argv[ ]) {
     int sockfd, newsockfd, portno;
     socklen_t clilen;
@@ -71,6 +72,24 @@ int main(int argc, char *argv[ ]) {
     struct Node *book_next;
     struct Node *next_frequent_search; 
     } Node;
+
+    void save_book(Node *book_head, int book_id) {
+        char filename[20];
+        sprintf(filename, "book_%2d.txt", book_id);
+        FILE *file = fopen(filename, "w");
+        if (file == NULL) {
+            perror("Error opening file");
+            return;
+        }
+
+        Node *current = book_head;
+        while (current != NULL) {
+            fprint(file, "%s\n", current->title);
+            current = current ->book_next;
+        }
+
+        fclose(file);
+    }
 
     pthread_mutex_t list_mutex = PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock(&list_mutex);
