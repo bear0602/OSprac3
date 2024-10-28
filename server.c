@@ -75,7 +75,7 @@ int main(int argc, char *argv[ ]) {
 
     void save_book(Node *book_head, int book_id) {
         char filename[20];
-        sprintf(filename, "book_%2d.txt", book_id);
+        sprintf(filename, "book_%02d.txt", book_id);
         FILE *file = fopen(filename, "w");
         if (file == NULL) {
             perror("Error opening file");
@@ -84,7 +84,7 @@ int main(int argc, char *argv[ ]) {
 
         Node *current = book_head;
         while (current != NULL) {
-            fprint(file, "%s\n", current->title);
+            fprint(file, "%s\n", current->line);
             current = current ->book_next;
         }
 
