@@ -14,12 +14,6 @@ void error(char *msg) {
     exit(1);
 } 
 
-// handle client connection
-void *handle_connection(void *arg) {
-    int client_sock = *(int *)arg;
-    free(arg);
-}
-
 //nolds data
 typedef struct Node {
     char line[256];
@@ -44,6 +38,16 @@ void save_book(Node *book_head, int book_id) {
     }
 
     fclose(file);
+}
+
+void *handle_connection(void *arg) {
+    int client_sock = *(int*)arg;
+    free(arg);
+
+    Node *book_head = NULL;
+    save_book(book_head, client_sock);
+    close(client_sock);
+    return NULL;
 }
 
 int main(int argc, char *argv[ ]) {
@@ -78,6 +82,7 @@ int main(int argc, char *argv[ ]) {
     bzero((char *) &serv_addr, sizeof(serv_addr));
 
     serv_addr.sin_family = AF_INET; //set address family to IPv4
+    serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(portno); //set port number
 
     //bind socket to port and address given
@@ -87,22 +92,22 @@ int main(int argc, char *argv[ ]) {
 
     //set sockt to listen for incomming connections with max backlog of 5
     listen(sockfd, 5);
-     //set client address length for accept call
-    clilen = sizeof(cli_addr);
+    //set client address length for accept call
+    while (1) {
+        clilen = sizeof(cli_addr);
+        int *newsockfd = malloc(sizeof(int));
     //accept incoming connection and create a new socket
-    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0) {
-        error("ERROR on accept"); // accept error
-    }
-
-    //recieve data if nothing to recieve
-    int flags = fcntl(sockfd, F_GETFL, 0);
-    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
-
+        newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+        if (newsockfd < 0) {
     //creates a new thread to handle connection
-    pthread_t client_thread;
-    pthread_create(&client_thread, NULL, handle_connection, (void *)&newsockfd);  
-
+            pthread_t client_thread;
+            pthread_create(&client_thread, NULL, handle_connection, (void *)&newsockfd);  
+            pthread_detach(client_thread);
+        }
+        else {
+            free(newsockfd);
+        }
+    }   
     //close sockets
     close(newsockfd);
     close(sockfd);
