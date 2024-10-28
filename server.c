@@ -19,10 +19,6 @@ void *handle_connection(void *arg) {
     return NULL;
 }
 
-//recieve data if nothing to recieve
-int flags = fcntl(newsockfd, F_GETFL, 0);
-fcntl(newsockfd, F_SETFL, flags | O_NONBLOCK);
-
 //nolds data
 typedef struct Node {
     char line[256];
@@ -72,6 +68,10 @@ int main(int argc, char *argv[ ]) {
         error("ERROR on accept"); // accept error
     }
 
+    //recieve data if nothing to recieve
+    int flags = fcntl(newsockfd, F_GETFL, 0);
+    fcntl(newsockfd, F_SETFL, flags | O_NONBLOCK);
+    
     //creates a new thread to handle connection
     pthread_t client_thread;
     pthread_create(&client_thread, NULL, handle_connection, (void *)&newsockfd);  
@@ -80,4 +80,6 @@ int main(int argc, char *argv[ ]) {
     close(newsockfd);
     close(sockfd);
     return 0;
+
+    
 }
