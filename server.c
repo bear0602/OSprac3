@@ -72,6 +72,10 @@ int main(int argc, char *argv[ ]) {
     struct Node *next_frequent_search; 
     } Node;
 
+    pthread_mutex_t list_mutex = PTHREAD_MUTEX_INITIALISER;
+    pthread_mutex_lock(&list_mutex);
+    pthread_mutex_unlock(&list_mutex);
+    
     //creates a new thread to handle connection
     pthread_t client_thread;
     pthread_create(&client_thread, NULL, handle_connection, (void *)&newsockfd);  
