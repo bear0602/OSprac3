@@ -21,11 +21,20 @@ void *handle_connection(void *arg) {
 
 // 
 int main(int argc, char *argv[ ]) {
-    int sockfd, newsockfd, portno;
+    int sockfd, newsockfd, portno = 1234;
     socklen_t clilen;
     char buffer[256];
     struct sockaddr_in serv_addr, cli_addr;
     int n;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-p") == 0 && i + 1 < argc) {
+            portno = atoi(argv[i + 1]);
+            i++;
+        }
+    }
+
+    printf("Using port: %d\n", portno);
 
     // check port number entered correctly
     if (argc < 2) {
