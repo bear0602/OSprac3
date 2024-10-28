@@ -19,14 +19,6 @@ void *handle_connection(void *arg) {
     return NULL;
 }
 
-//nolds data
-typedef struct Node {
-    char line[256];
-    struct Node *next;
-    struct Node *book_next;
-    struct Node *next_frequent_search;
-} Node;
-
 int main(int argc, char *argv[ ]) {
     int sockfd, newsockfd, portno;
     socklen_t clilen;
@@ -71,7 +63,15 @@ int main(int argc, char *argv[ ]) {
     //recieve data if nothing to recieve
     int flags = fcntl(newsockfd, F_GETFL, 0);
     fcntl(newsockfd, F_SETFL, flags | O_NONBLOCK);
-    
+
+    //nolds data
+    typedef struct Node {
+    char line[256];
+    struct Node *next;
+    struct Node *book_next;
+    struct Node *next_frequent_search; 
+    } Node;
+
     //creates a new thread to handle connection
     pthread_t client_thread;
     pthread_create(&client_thread, NULL, handle_connection, (void *)&newsockfd);  
